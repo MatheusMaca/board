@@ -7,9 +7,16 @@ export default function Home() {
       <Head>
         <title>Board - Organizado suas tarefas</title>
       </Head>
-      <div>
-        <h1>Primeiro app</h1>
-      </div>
+      <main className={styles.contentContainer}>
+        <img src="/images/board-user.svg" alt="Ferramente board"></img>
+        <section className={styles.callToAction}>
+          <h1>Uma ferramenta para seu dia a dia Escreva, planeje e organize-se</h1>
+          <p><span>100% Gratuita</span> e online</p>
+        </section>
+        <div className={styles.donaters}>
+          <img src="https://pbs.twimg.com/profile_images/1175909835789017088/qs7lZAO2_400x400.jpg" alt="Usuário 1"></img>
+        </div>
+      </main>
     </>
   );
 }
