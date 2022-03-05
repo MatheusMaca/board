@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import styles from './styles.module.scss';
 import { FiCalendar, FiClock, FiEdit2, FiPlus, FiTrash } from 'react-icons/fi';
+import { SupportButton } from '../../components/SupportButton'
 
 export default function Board() {
     return (
@@ -47,6 +48,7 @@ export default function Board() {
                     <time>Ultima doação foi a 3 dias.</time>
                 </div>
             </div>
+            <SupportButton />
         </>
 
     )
