@@ -14,11 +14,21 @@ interface BoardProps {
         id: string;
         nome: string;
     }
+    data: string;
 }
 
-export default function Board({ user }: BoardProps) {
+type TaskList = {
+    id: string;
+    created: string | Date;
+    createdFormated?: string;
+    tarefa: string;
+    userId: string;
+    nome: string;
+}
+
+export default function Board({ user, data }: BoardProps) {
     const [input, setInput] = useState('');
-    const [taskList, setTaskList] = useState([]);
+    const [taskList, setTaskList] = useState<TaskList[]>(JSON.parse(data));
 
     async function handleAddTask(e: FormEvent) {
         e.preventDefault();
@@ -70,7 +80,7 @@ export default function Board({ user }: BoardProps) {
                         <FiPlus size={25} color="#17181f" />
                     </button>
                 </form>
-                <h1>Você tem 2 tarefas!</h1>
+                <h1>Você tem {taskList.length} {taskList.length === 1 ? 'Tarefa' : 'Tarefas'}!</h1>
 
                 <section>
                     {taskList.map(task => (
@@ -125,6 +135,18 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
         }
     }
 
+    const tasks = await firebase.firestore().collection('tarefas')
+    .where('userId', '==', session.id)
+    .orderBy('created', 'asc').get();
+
+    const data = JSON.stringify(tasks.docs.map(item => {
+        return {
+            id: item.id,
+            createdFormated: format(item.data().created.toDate(), 'dd MMMM yyyy'),
+            ...item.data(),
+        }
+    }));
+
     const user = {
         nome: session?.user.name,
         id: session?.id
@@ -132,7 +154,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
     return {
         props: {
-            user
+            user,
+            data
         }
     }
 }
