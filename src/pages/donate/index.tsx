@@ -3,6 +3,9 @@ import Head from 'next/head';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/client';
 import { userInfo } from 'os';
+import { PayPalButtons } from '@paypal/react-paypal-js';
+import firebase from '../../services/firebaseConnection';
+import { useState } from "react";
 
 interface DonateProps {
     user: {
@@ -13,6 +16,22 @@ interface DonateProps {
 }
 
 export default function Donate({ user }: DonateProps) {
+    const [vip, setVip] = useState(false);
+    const [donationValue, setDonationValue] = useState("1");
+
+    async function handleSaveDonate() {
+        await firebase.firestore().collection('users')
+            .doc(user.id)
+            .set({
+                donate: true,
+                lastDonate: new Date(),
+                Image: user.image
+            })
+            .then(() => {
+                setVip(true);
+            })
+    }
+
     return (
         <>
             <Head>
@@ -21,19 +40,39 @@ export default function Donate({ user }: DonateProps) {
             <main className={styles.container}>
                 <img src="/images/rocket.svg" alt="Seja Apoiador" />
 
-                <div className={styles.vip}>
-                    <img src={user.image} alt="foto do perfil do usuário" />
-                    <span>Parabéns você é um novo apoiador!</span>
-                </div>
+                {vip && (
+                    <div className={styles.vip}>
+                        <img src={user.image} alt="foto do perfil do usuário" />
+                        <span>Parabéns você é um novo apoiador!</span>
+                    </div>
+                )}
 
                 <h1>Seja um apoiador deste projeto! 💰</h1>
-                <h3>Contribua com <span>qualquer valor</span></h3>
-                <strong>Suas vantagens são:</strong>
-                <ul>
-                    <li>Sua foto na Home</li>
-                    <li>Editar tarefas</li>
-                    <li>Detalhes das tarefas</li>
-                </ul>
+                <h3>Contribua com <span>com um valor abaixo</span></h3>
+
+                <div className={styles.donateValues}>
+                    <button onClick={() => setDonationValue("1")}>1</button>
+                    <button onClick={() => setDonationValue("5")}>5</button>
+                    <button onClick={() => setDonationValue("10")}>10</button>
+                    <button onClick={() => setDonationValue("25")}>25</button>
+                </div>
+                <PayPalButtons
+                    forceReRender={[donationValue]}
+                    createOrder={(data, actions) => {
+                        console.log(donationValue)
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: donationValue
+                                }
+                            }]
+                        })
+                    }}
+                    onApprove={(data, actions) => {
+                        return actions.order.capture().then(function (details) {
+                            handleSaveDonate();
+                        })
+                    }} />
             </main>
         </>
     )

@@ -1,4 +1,4 @@
-.container{
+.container {
     max-width: 1120px;
     margin: 0 auto;
     padding: 0 2rem;
@@ -9,42 +9,84 @@
     justify-content: center;
     flex-direction: column;
 
-    h1{
+    h1 {
         margin: 1rem 0;
         font-size: 2.3rem;
     }
 
-    h3{
-        margin-top: rem;
+    h3 {
+        margin-top: 1rem;
 
-        span{
+        span {
             font-weight: bold;
             color: #019950;
         }
     }
 
-    strong{
+    input {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        width: 150px;
+        height: 2rem;
+        border: 2px solid #019950;
+        border-radius: 5%;
+        font-size: 100%;
+        font-weight: bolder;
+        padding-left: 50px;
+    }
+
+    input:focus {
+        width: 200px;
+        padding-left: 75px;
+    }
+
+    strong {
         margin-top: 1rem;
         font-size: 1.1rem;
     }
 
-    ul{
+    ul {
         margin-top: 0.5rem;
     }
 }
 
-.vip{
+.vip {
     margin-top: 1.5rem;
     background-color: #019950;
     padding: 1rem;
     border-radius: 5px;
     color: #FFFF;
 
-    img{
+    img {
         width: 50px;
         height: 50px;
         vertical-align: middle;
         border-radius: 50%;
         margin-right: 10px;
+    }
+}
+
+.donateValues{
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    button{
+        border: none;
+        width: 50px;
+        height: 50px;
+        font-size: 100%;
+        font-weight: bolder;
+        border-radius: 50%;
+    }
+
+    &+button {
+        margin-left: 15px;
+    }
+
+    button:focus {
+        width: 52px;
+        height: 52px;
+        font-size: 110%;
+        background-color: #019950;
     }
 }
