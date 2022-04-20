@@ -25,7 +25,7 @@ export default function Donate({ user }: DonateProps) {
             .set({
                 donate: true,
                 lastDonate: new Date(),
-                Image: user.image
+                image: user.image
             })
             .then(() => {
                 setVip(true);
@@ -59,7 +59,6 @@ export default function Donate({ user }: DonateProps) {
                 <PayPalButtons
                     forceReRender={[donationValue]}
                     createOrder={(data, actions) => {
-                        console.log(donationValue)
                         return actions.order.create({
                             purchase_units: [{
                                 amount: {
