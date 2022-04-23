@@ -104,7 +104,6 @@ export default function Board({ user, data }: BoardProps) {
     function handleEditTask(task: TaskList) {
         setTaskEdit(task);
         setInput(task.tarefa);
-
     }
 
     function handleCancelEdit() {
@@ -151,30 +150,31 @@ export default function Board({ user, data }: BoardProps) {
                                         <FiCalendar size={20} color="#FFB800" />
                                         <time>{task.createdFormated}</time>
                                     </div>
-                                    <button onClick={() => handleEditTask(task)}>
-                                        <FiEdit2 size={20} color="#FFF" />
-                                        <span>Editar</span>
-                                    </button>
+                                    {user.vip && (
+                                        <button onClick={() => handleEditTask(task)}>
+                                            <FiEdit2 size={20} color="#FFF" />
+                                            <span>Editar</span>
+                                        </button>
+                                    )}
                                 </div>
-                                {user.vip && (
-                                    <button onClick={() => handleDelete(task.id)}>
-                                        <FiTrash size={20} color="#FF3636" />
-                                        <span>Excluir</span>
-                                    </button>
-                                )}
+                                <button onClick={() => handleDelete(task.id)}>
+                                    <FiTrash size={20} color="#FF3636" />
+                                    <span>Excluir</span>
+                                </button>
                             </div>
                         </article>
                     ))}
                 </section>
-                <SupportButton />
-
+                {!user.vip && (
+                    <SupportButton />
+                )}
             </main>
             {user.vip && (
                 <div className={styles.vipContainer}>
                     <h3>Obrigado por apoiar esse projeto</h3>
                     <div>
                         <FiClock size={28} color="#FFF" />
-                        <time>Ultima doação foi a {formatDistance(new Date(user.lastDonate), new Date(), {locale: ptBR})}.</time>
+                        <time>Ultima doação foi a {formatDistance(new Date(user.lastDonate), new Date(), { locale: ptBR })}.</time>
                     </div>
                 </div>
             )}
@@ -203,7 +203,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     const data = JSON.stringify(tasks.docs.map(item => {
         return {
             id: item.id,
-            createdFormated: format(item.data().created.toDate(), 'dd MMMM yyyy', {locale: ptBR}),
+            createdFormated: format(item.data().created.toDate(), 'dd MMMM yyyy', { locale: ptBR }),
             ...item.data(),
         }
     }));
