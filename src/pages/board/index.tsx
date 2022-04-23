@@ -7,12 +7,15 @@ import styles from './styles.module.scss';
 import { FiCalendar, FiClock, FiEdit2, FiPlus, FiTrash, FiX } from 'react-icons/fi';
 import { SupportButton } from '../../components/SupportButton';
 import firebase from '../../services/firebaseConnection';
-import { format } from 'date-fns';
+import { format, formatDistance } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface BoardProps {
     user: {
         id: string;
         nome: string;
+        vip: boolean,
+        lastDonate: string | Date;
     }
     data: string;
 }
@@ -39,22 +42,22 @@ export default function Board({ user, data }: BoardProps) {
             return;
         }
 
-        if(taskEdit){
+        if (taskEdit) {
             await firebase.firestore().collection('tarefas').doc(taskEdit.id)
-            .update({
-                tarefa: input
-            })
-            .then(()=>{
-                let data = taskList;
-                let taskIndex = taskList.findIndex(item => item.id === taskEdit.id);
-                data[taskIndex].tarefa = input;
-                setTaskList(data);
-                setTaskEdit(null);
-                setInput('');
-            })
-            .catch((err) => {
-                console.log('Erro ao atualizar: ', err);
-            })
+                .update({
+                    tarefa: input
+                })
+                .then(() => {
+                    let data = taskList;
+                    let taskIndex = taskList.findIndex(item => item.id === taskEdit.id);
+                    data[taskIndex].tarefa = input;
+                    setTaskList(data);
+                    setTaskEdit(null);
+                    setInput('');
+                })
+                .catch((err) => {
+                    console.log('Erro ao atualizar: ', err);
+                })
 
             return;
         }
@@ -101,7 +104,7 @@ export default function Board({ user, data }: BoardProps) {
     function handleEditTask(task: TaskList) {
         setTaskEdit(task);
         setInput(task.tarefa);
-        
+
     }
 
     function handleCancelEdit() {
@@ -153,24 +156,28 @@ export default function Board({ user, data }: BoardProps) {
                                         <span>Editar</span>
                                     </button>
                                 </div>
-
-                                <button onClick={() => handleDelete(task.id)}>
-                                    <FiTrash size={20} color="#FF3636" />
-                                    <span>Excluir</span>
-                                </button>
+                                {user.vip && (
+                                    <button onClick={() => handleDelete(task.id)}>
+                                        <FiTrash size={20} color="#FF3636" />
+                                        <span>Excluir</span>
+                                    </button>
+                                )}
                             </div>
                         </article>
                     ))}
                 </section>
+                <SupportButton />
+
             </main>
-            <div className={styles.vipContainer}>
-                <h3>Obrigado por apoiar esse projeto</h3>
-                <div>
-                    <FiClock size={28} color="#FFF" />
-                    <time>Ultima doação foi a 3 dias.</time>
+            {user.vip && (
+                <div className={styles.vipContainer}>
+                    <h3>Obrigado por apoiar esse projeto</h3>
+                    <div>
+                        <FiClock size={28} color="#FFF" />
+                        <time>Ultima doação foi a {formatDistance(new Date(user.lastDonate), new Date(), {locale: ptBR})}.</time>
+                    </div>
                 </div>
-            </div>
-            <SupportButton />
+            )}
         </>
 
     )
@@ -196,14 +203,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     const data = JSON.stringify(tasks.docs.map(item => {
         return {
             id: item.id,
-            createdFormated: format(item.data().created.toDate(), 'dd MMMM yyyy'),
+            createdFormated: format(item.data().created.toDate(), 'dd MMMM yyyy', {locale: ptBR}),
             ...item.data(),
         }
     }));
 
     const user = {
         nome: session?.user.name,
-        id: session?.id
+        id: session?.id,
+        vip: session?.vip,
+        lastDonate: session?.lastDonate
     }
 
     return {
